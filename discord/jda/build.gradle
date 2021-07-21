@@ -1,0 +1,13 @@
+repositories {
+    maven {
+        name "m2-dv8tion"
+        url "https://m2.dv8tion.net/releases"
+    }
+}
+
+dependencies {
+    implementation "net.dv8tion:JDA:4.3.0_298"
+    testImplementation "net.dv8tion:JDA:4.3.0_298"
+
+    implementation project(":common")
+}
