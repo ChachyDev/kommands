@@ -43,7 +43,7 @@ allprojects {
             mavenJava(MavenPublication) {
                 from components.java
                 pom {
-                    name = project.name
+                    if (project.name == "kommands") name = project.name else name = "kommands-${project.name}"
                     url = "https://github.com/ChachyDev/kommands"
 
                     developers {
