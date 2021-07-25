@@ -2,6 +2,7 @@ package club.chachy.kommands.handler
 
 import club.chachy.kommands.argument.ArgumentHandler
 import club.chachy.kommands.command.Command
+import club.chachy.kommands.exception.UnknownCommandException
 import club.chachy.kommands.perrmission.isValid
 
 class KommandHandler<T> {
@@ -25,7 +26,7 @@ class KommandHandler<T> {
                     ?.let { it.removeAt(0) to it }
                     ?: return
 
-                val command = commands[name] ?: return
+                val command = commands[name] ?: throw UnknownCommandException(name)
 
                 if (command.permissions.isValid(context)) {
                     handler.process(command, args)
