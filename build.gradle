@@ -5,6 +5,7 @@ plugins {
 
 allprojects {
     apply plugin: "kotlin"
+    apply plugin: "maven-publish"
 
     group "club.chachy"
     version "0.1.0"
@@ -29,4 +30,29 @@ allprojects {
     }
 
     jar.dependsOn shadowJar
+
+    publishing {
+        repositories {
+            maven {
+                url = "$buildDir/repository"
+            }
+        }
+
+        publications {
+            //noinspection GroovyAssignabilityCheck
+            mavenJava(MavenPublication) {
+                from components.java
+                pom {
+                    name = project.name
+                    url = "https://github.com/ChachyDev/kommands"
+
+                    developers {
+                        developer {
+                            name = "ChachyDev"
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
