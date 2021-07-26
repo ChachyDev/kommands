@@ -20,15 +20,24 @@ class ArgumentProcessor<C>(
         val commandSpec = command.spec.split(" ")
 
         commandSpec.forEachIndexed { index, s ->
-            val clean = s.clean()
+            var clean = s.clean()
 
             val isVararg = clean.endsWith("...")
+
+            clean = clean.removeVararg()
 
             if (index != (commandSpec.size - 1) && isVararg) {
                 error("Varargs can only be used at the end of the spec!")
             }
 
-            specs[clean.removeVararg()] = Spec(if (isVararg) raw.mapNotNull { if (raw.indexOf(it) >= index) it else null }.joinToString(" ").takeIf { it.isNotBlank() } else raw.getOrNull(index), s.startsWith("<") && s.endsWith(">"))
+            val value = if (isVararg) raw.mapNotNull { if (raw.indexOf(it) >= index) it else null }.joinToString(" ")
+                .takeIf { it.isNotBlank() } else raw.getOrNull(index)
+
+            val isRequired = s.startsWith("<") && s.endsWith(">")
+
+            clean.split("|").forEach {
+                specs[it] = Spec(value, isRequired)
+            }
         }
     }
 
