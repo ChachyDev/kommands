@@ -11,5 +11,5 @@ interface Command<T> {
     val permissions: List<Permission<T>>
         get() = listOf()
 
-    fun execute(args: ArgumentHandler, context: T)
+    fun execute(args: ArgumentHandler<T>, context: T)
 }

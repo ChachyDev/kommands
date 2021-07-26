@@ -3,25 +3,25 @@ package club.chachy.kommands.jda
 import club.chachy.kommands.argument.ArgumentHandler
 import club.chachy.kommands.argument.processor.ArgumentProcessor
 import club.chachy.kommands.handler.KommandHandler
-import club.chachy.kommands.jda.context.DiscordContext
-import club.chachy.kommands.jda.prefix.PrefixHandler
+import club.chachy.kommands.jda.context.JDAContext
+import club.chachy.kommands.jda.serialization.JDASerializationFactory
+import club.chachy.kommands.prefix.PrefixHandler
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 
 class CommandListener(
-    private val prefix: PrefixHandler,
-    val handler: KommandHandler<DiscordContext> = KommandHandler(),
+    private val prefix: PrefixHandler<JDAContext>,
+    val handler: KommandHandler<JDAContext> = KommandHandler(),
     private val delimiter: String = " ",
-    private val argumentHandler: ArgumentHandler = ArgumentProcessor(),
+    private val argumentHandler: ArgumentHandler<JDAContext> = ArgumentProcessor(JDASerializationFactory()),
     private val exceptionHandler: Throwable.() -> Unit = { printStackTrace() }
 ) : ListenerAdapter() {
     override fun onMessageReceived(event: MessageReceivedEvent) {
-        val context = DiscordContext(event.guild, event.message, event.channel, event.author)
         handler.handle(
-            prefix.get(context),
+            prefix,
             event.message.contentRaw,
-            context,
+            JDAContext(event.guild, event.message, event.channel, event.author),
             argumentHandler,
             exceptionHandler,
             delimiter
@@ -29,11 +29,10 @@ class CommandListener(
     }
 
     override fun onMessageUpdate(event: MessageUpdateEvent) {
-        val context = DiscordContext(event.guild, event.message, event.channel, event.author)
         handler.handle(
-            prefix.get(context),
+            prefix,
             event.message.contentRaw,
-            context,
+            JDAContext(event.guild, event.message, event.channel, event.author),
             argumentHandler,
             exceptionHandler,
             delimiter

@@ -1,5 +1,5 @@
 package club.chachy.kommands.argument.processor.serializer
 
-interface Serializer<T> {
-    fun serialize(data: String): T?
+interface Serializer<T, C> {
+    fun serialize(data: String, context: C): T?
 }

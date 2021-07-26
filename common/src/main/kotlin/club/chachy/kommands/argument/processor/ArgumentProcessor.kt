@@ -6,14 +6,17 @@ import club.chachy.kommands.argument.processor.serializer.Serializer
 import club.chachy.kommands.argument.processor.serializer.default.DefaultSerializationFactory
 import club.chachy.kommands.command.Command
 
-class ArgumentProcessor(
+class ArgumentProcessor<C>(
     private val serializationFactory: SerializationFactory = DefaultSerializationFactory()
-) : ArgumentHandler {
+) : ArgumentHandler<C> {
     data class Spec(val value: String?, val isRequired: Boolean)
 
     private val specs = HashMap<String, Spec>()
 
-    override fun process(command: Command<*>, raw: List<String>) {
+    private var ctx: C? = null
+
+    override fun process(command: Command<*>, raw: List<String>, context: C) {
+        ctx = context
         val commandSpec = command.spec.split(" ")
 
         commandSpec.forEachIndexed { index, s ->
@@ -34,7 +37,7 @@ class ArgumentProcessor(
         val value = specs[name] ?: return null
         if (value.isRequired && value.value == null) error("Could not find argument for $name")
 
-        return (serializationFactory.serializers[clazz] as? Serializer<T>)?.serialize(value.value ?: return null)
+        return (serializationFactory.serializers[clazz] as? Serializer<T, C>)?.serialize(value.value ?: return null, ctx!!)
     }
 }
 

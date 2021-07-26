@@ -4,22 +4,25 @@ import club.chachy.kommands.argument.ArgumentHandler
 import club.chachy.kommands.command.Command
 import club.chachy.kommands.exception.UnknownCommandException
 import club.chachy.kommands.perrmission.isValid
+import club.chachy.kommands.prefix.PrefixHandler
 
-class KommandHandler<T> {
+open class KommandHandler<T> {
     private val commands: MutableMap<String, Command<T>> = HashMap()
 
     fun handle(
-        prefix: List<String>,
+        prefix: PrefixHandler<T>,
         message: String,
         context: T,
-        handler: ArgumentHandler,
+        handler: ArgumentHandler<T>,
         exceptionHandler: Throwable.() -> Unit,
         delimiter: String = " "
     ) {
+        val prefixes = prefix.get(context)
+
         try {
-            if (message.startsWith(prefix)) {
+            if (message.startsWith(prefixes)) {
                 val (name, args) = message
-                    .removePrefix(prefix)
+                    .removePrefix(prefixes)
                     .takeIf { it.isNotEmpty() }
                     ?.split(delimiter)
                     ?.toMutableList()
@@ -29,7 +32,7 @@ class KommandHandler<T> {
                 val command = commands[name] ?: throw UnknownCommandException(name)
 
                 if (command.permissions.isValid(context)) {
-                    handler.process(command, args)
+                    handler.process(command, args, context)
                     command.execute(handler, context)
                 }
             }
