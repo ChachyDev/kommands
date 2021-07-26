@@ -28,7 +28,7 @@ class ArgumentProcessor<C>(
                 error("Varargs can only be used at the end of the spec!")
             }
 
-            specs[clean.removeVararg()] = Spec(if (isVararg) raw.mapNotNull { if (raw.indexOf(it) >= index) it else null }.joinToString(" ") else raw.getOrNull(index), s.startsWith("<") && s.endsWith(">"))
+            specs[clean.removeVararg()] = Spec(if (isVararg) raw.mapNotNull { if (raw.indexOf(it) >= index) it else null }.joinToString(" ").takeIf { it.isNotBlank() } else raw.getOrNull(index), s.startsWith("<") && s.endsWith(">"))
         }
     }
 
