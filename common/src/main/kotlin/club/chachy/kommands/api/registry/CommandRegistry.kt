@@ -4,7 +4,7 @@ import club.chachy.kommands.api.command.Command
 import club.chachy.kommands.api.context.CommandContext
 
 interface CommandRegistry {
-    val commands: List<Command<*, *>>
+    val commands: Map<String, Command<*, *>>
 
     fun <T : Any?, C : CommandContext> register(command: Command<T, C>)
     fun lookup(name: String): Command<Any?, CommandContext>?
@@ -14,8 +14,8 @@ interface CommandRegistry {
     companion object Global : CommandRegistry {
         @Suppress("ObjectPropertyName")
         private val _commands = HashMap<String, Command<Any?, CommandContext>>()
-        override val commands: List<Command<*, CommandContext>>
-            get() = _commands.values.toList()
+        override val commands: Map<String, Command<*, CommandContext>>
+            get() = _commands.toMap()
 
         @Suppress("UNCHECKED_CAST")
         override fun <T, C : CommandContext> register(command: Command<T, C>) {

@@ -25,18 +25,21 @@ inline fun <reified Context : CommandContext> CommandRegistry.command(
     name: String,
     description: String? = null,
     permissions: Collection<Permission<Context>> = setOf(),
+    parent: String? = null,
     crossinline block: CommandParams<NoArguments, Context>.() -> Unit
-) = command(name, description, null, permissions, block)
+) = command(name, description, null, permissions, parent, block)
 
 
+@Suppress("UNCHECKED_CAST")
 inline fun <reified Args, reified Context : CommandContext> CommandRegistry.command(
     name: String,
     description: String? = null,
     args: KFunction<Args>? = null,
     permissions: Collection<Permission<Context>> = setOf(),
+    parent: String? = null,
     crossinline block: CommandParams<Args, Context>.() -> Unit
 ) {
-    register(object : Command<Args, Context> {
+    val cmd = object : Command<Args, Context> {
         override val name = name
         override val description = description
         override val argumentsClass = args
@@ -49,7 +52,16 @@ inline fun <reified Args, reified Context : CommandContext> CommandRegistry.comm
 
             block(CommandParams(args, context))
         }
-    })
+
+        override val subcommands: MutableMap<String, Command<*, Context>> = mutableMapOf()
+    }
+    if (parent != null) {
+        val parentCommand =
+            (commands[parent] ?: error("Failed to find parent command for subcommand")) as Command<Any, Context>
+        parentCommand.subcommands[name] = cmd
+    } else {
+        register(cmd)
+    }
 }
 
 fun withRegistryContext(

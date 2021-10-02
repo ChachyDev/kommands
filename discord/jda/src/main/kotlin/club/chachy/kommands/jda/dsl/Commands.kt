@@ -22,25 +22,30 @@ inline fun <reified Args> CommandRegistry.textCommand(
     description: String? = null,
     args: KFunction<Args>,
     permissions: Collection<Permission<MessageContext>> = setOf(),
+    parent: String? = null,
     crossinline block: CommandParams<Args, MessageContext>.() -> Unit
-) = command(name, description, args, permissions, block)
+) = command(name, description, args, permissions, parent, block)
 
 inline fun CommandRegistry.textCommand(
     name: String,
     description: String? = null,
     permissions: Collection<Permission<MessageContext>> = setOf(),
+    parent: String? = null,
     crossinline block: CommandParams<NoArguments, MessageContext>.() -> Unit
-) = command(name, description, permissions, block)
+) = command(name, description, permissions, parent, block)
 
 inline fun <reified Args> CommandRegistry.slashCommand(
     name: String,
     description: String,
-    args: KFunction<Args>?,
+    jda: JDA,
+    args: KFunction<Args>? = null,
     permissions: Collection<Permission<SlashCommandContext>> = setOf(),
     guild: Guild? = null,
-    jda: JDA,
+    parent: String? = null,
     crossinline block: CommandParams<Args, SlashCommandContext>.() -> Unit
 ) {
+    // TODO: Subcommand support as it's internally supported but not via slash commands
+    // TODO: Rework messy system (current one)
     if (guild != null) {
         val guildCmds = commands(guild)
         val cmd = guildCmds[guild.idLong]?.find { it.name == name }
@@ -65,20 +70,21 @@ inline fun <reified Args> CommandRegistry.slashCommand(
     }
 
     if (args == null) {
-        command(name, description, null, permissions, block)
+        command(name, description, null, permissions, parent, block)
     } else {
-        command(name, description, args, permissions, block)
+        command(name, description, args, permissions, parent, block)
     }
 }
 
 inline fun CommandRegistry.slashCommand(
     name: String,
     description: String,
+    jda: JDA,
     permissions: Collection<Permission<SlashCommandContext>> = setOf(),
     guild: Guild? = null,
-    jda: JDA,
+    parent: String? = null,
     crossinline block: CommandParams<NoArguments, SlashCommandContext>.() -> Unit
-) = slashCommand(name, description, null, permissions, guild, jda, block)
+) = slashCommand(name, description, jda, null, permissions, guild, parent, block)
 
 
 fun commands(jda: JDA): MutableList<Command> {

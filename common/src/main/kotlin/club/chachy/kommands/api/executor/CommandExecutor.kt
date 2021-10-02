@@ -55,9 +55,14 @@ interface CommandExecutor {
             factory: SerializationFactory
         ) {
             val cmd = commandRegistry.lookup(name) ?: throw IllegalCommandException("Unknown command ($name)")
-            if (cmd.permissions.all { it.accept(context) }) {
-                val argsClass = cmd.argumentsClass?.let { createArgsClass(args, it, factory, context) }
-                cmd.onExecute(argsClass, context)
+            val possibleSubcommand = args[0]
+            if (cmd.subcommands.containsKey(possibleSubcommand)) {
+                execute(commandRegistry, possibleSubcommand, args.toMutableList().apply { removeAt(0) }, context, factory)
+            } else {
+                if (cmd.permissions.all { it.accept(context) }) {
+                    val argsClass = cmd.argumentsClass?.let { createArgsClass(args, it, factory, context) }
+                    cmd.onExecute(argsClass, context)
+                }
             }
         }
 

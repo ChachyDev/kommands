@@ -10,6 +10,7 @@ interface Command<Arguments, Context : CommandContext> {
     val argumentsClass: KFunction<Arguments>?
     val permissions: Collection<Permission<Context>>
         get() = setOf()
+    val subcommands: MutableMap<String, Command<*, Context>>
 
     fun onExecute(args: Arguments?, context: CommandContext)
 }
