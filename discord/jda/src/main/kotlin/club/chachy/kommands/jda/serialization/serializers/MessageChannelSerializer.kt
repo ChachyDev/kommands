@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.entities.MessageChannel
 object MessageChannelSerializer : JDASerializer<MessageChannel> {
     private val mentionRegex = "<#(\\d{18,21})>".toRegex()
 
-    override fun serialize(data: String, context: JDAContext): MessageChannel? {
+    override fun deserialize(data: String, context: JDAContext): MessageChannel? {
         data.toLongOrNull()?.let { return context.guild?.getTextChannelById(it) }
 
         return mentionRegex.find(data)?.groupValues?.let {

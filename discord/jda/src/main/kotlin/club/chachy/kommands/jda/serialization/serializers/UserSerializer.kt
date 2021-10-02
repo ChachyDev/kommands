@@ -10,8 +10,8 @@ object UserSerializer : JDASerializer<User> {
 
     val mentionRegex = "<@!?(\\d{18,21})>".toRegex()
 
-    override fun serialize(data: String, context: JDAContext): User? {
-        val jda = context.message.jda
+    override fun deserialize(data: String, context: JDAContext): User? {
+        val jda = context.author.jda
 
         // Normal ID
         val id = data.toLongOrNull()

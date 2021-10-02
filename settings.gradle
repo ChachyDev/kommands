@@ -27,5 +27,4 @@ pluginManagement {
 }
 
 rootProject.name = "kommands"
-
 include ":common", ":discord:jda"

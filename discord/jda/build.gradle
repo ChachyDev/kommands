@@ -10,4 +10,6 @@ dependencies {
     testImplementation "net.dv8tion:JDA:4.3.0_298"
 
     implementation project(":common")
+    implementation project(":discord")
+    implementation "org.jetbrains.kotlin:kotlin-reflect"
 }
